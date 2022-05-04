@@ -13,6 +13,10 @@ int led_state = LOW;
 int button_state;
 int last_button_state;
 
+const IPAddress serverIP(189,202,79,700); // La dirección que desea visitar
+uint16_t serverPort = 20064;         // Número de puerto del servidor
+WiFiClient client; // Declarar un objeto cliente para conectarse al servidor
+
 void setup()
 {
     pinMode(2,OUTPUT);
@@ -44,52 +48,34 @@ void loop()
     delay(100);
     digitalWrite(2,LOW);
     delay(100);
-    Serial.println("Si jala la pantalla");
-//  const uint16_t port = 80;
-//  const char * host = "192.168.1.1"; // ip or dns
-    const uint16_t port = 20064;
-    const char * host = "127.0.0.1"; // ip or dns
-
-    Serial.print("Connecting to "); Serial.println(host);
-
-    // Use WiFiClient class to create TCP connections
-    WiFiClient client;
-
-    if (!client.connect(host, port)) 
+    Serial.println("Intenta acceder al servidor");
+    if (client.connect(serverIP, serverPort)) // Intenta acceder a la dirección de destino
     {
-        Serial.println("Connection failed.");
-        Serial.println("Waiting 5 seconds before retrying...");
-        delay(5000); return;
+        Serial.println("Visita exitosa");
+
+        client.print("Hello world!");                    // Enviar datos al servidor
+        while (client.connected() || client.available()) // Si está conectado
+        {
+            if (client.connected()) // Si estamos conectados
+            {
+                last_button_state = button_state; 
+                button_state = digitalRead(BUTTON_PIN);
+                if (last_button_state == HIGH && button_state == LOW)
+                {
+                    Serial.println("Si jala el boton"); 
+                    led_state = !led_state;
+                    digitalWrite(LED_PIN, led_state);
+                    client.print("1");
+                } 
+            }
+        }
+        Serial.println("Cerrar la conexión actual");
+        client.stop(); // Cerrar el cliente
     }
-
-  last_button_state = button_state; 
-  button_state = digitalRead(BUTTON_PIN);
-  if (last_button_state == HIGH && button_state == LOW)
-  {
-    Serial.println("Si jala el boton"); 
-    led_state = !led_state;
-    digitalWrite(LED_PIN, led_state);
-    //This will send a request to the server
-    client.print("1");
-  } 
-  int maxloops = 0;
-  //wait for the server's reply to become available
-  while (!client.available() && maxloops < 1000)
-  {
-    maxloops++;
-    delay(1); //delay 1 msec
-  }
-  if (client.available() > 0)
-  {
-    //read back one line from the server
-    String line = client.readStringUntil('\r'); Serial.println(line);
-  }
-  else
-  {
-    Serial.println("client.available() timed out ");
-  }
-
-    Serial.println("Closing connection."); client.stop();
-
-    Serial.println("Waiting 5 seconds before restarting..."); delay(5000);
+    else
+    {
+        Serial.println("Acceso fallido");
+        client.stop(); // Cerrar el cliente
+    }
+    delay(5000);
 }
