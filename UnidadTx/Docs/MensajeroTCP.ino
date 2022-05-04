@@ -7,8 +7,8 @@
 
 WiFiMulti WiFiMulti;
 
-#define BUTTON_PIN 16
-#define LED_PIN 18
+#define BUTTON_PIN 4
+#define LED_PIN 23
 int led_state = LOW;
 int button_state;
 int last_button_state;
@@ -44,6 +44,7 @@ void loop()
     delay(100);
     digitalWrite(2,LOW);
     delay(100);
+    Serial.println("Si jala la pantalla");
 //  const uint16_t port = 80;
 //  const char * host = "192.168.1.1"; // ip or dns
     const uint16_t port = 20064;
