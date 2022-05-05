@@ -1,7 +1,7 @@
 #include <WiFi.h>
 
-const char *ssid = "INFINITUM144F_2.4";
-const char *password = "yfCtu7MuHT";
+const char* ssid = "INFINITUM144F_2.4";
+const char* password = "yfCtu7MuHT";
 
 #define LED_PIN 23
 int led_state = LOW;
@@ -17,8 +17,9 @@ int led_state = LOW;
   #endif
 #endif
 
-const IPAddress serverIP(189,202,79,700); // La dirección que desea visitar
-uint16_t serverPort = 6500;         // Número de puerto del servidor
+const char* server = "192.168.1.78"; //Enter server adress
+const uint16_t port = 4200; // Enter server portippip 
+uint64_t messageTimestamp;      // Número de puerto del servidor
 
 WiFiClient client; // Declarar un objeto cliente para conectarse al servidor
 
@@ -27,24 +28,27 @@ void setup()
     Serial.begin(115200);
     Serial.println();
 
-    WiFi.mode(WIFI_STA);
-    WiFi.setSleep(false); // Desactiva la suspensión de wifi en modo STA para mejorar la velocidad de respuesta
-    WiFi.begin(ssid, password);
-    while (WiFi.status() != WL_CONNECTED)
-    {
-        delay(500);
-        Serial.print(".");
-    }
-    Serial.println("Connected");
-    Serial.print("IP Address:");
-    Serial.println(WiFi.localIP());
+   delay(10);
+   Serial.println("");
+   WiFi.mode(WIFI_STA);
+   WiFi.begin(ssid, password);
+   while (WiFi.status() != WL_CONNECTED) 
+   { 
+     delay(100);  
+     Serial.print('.'); 
+   }
+   Serial.println("");
+   Serial.print("Iniciado STA:\t");
+   Serial.println(ssid);
+   Serial.print("IP address:\t");
+   Serial.println(WiFi.localIP());
     pinMode(LED_PIN, OUTPUT);
 }
 
 void loop()
 {
     Serial.println("Intenta acceder al servidor");
-    if (client.connect(serverIP, serverPort)) // Intenta acceder a la dirección de destino
+    if (client.connect(server, port)) // Intenta acceder a la dirección de destino
     {
         Serial.println("Visita exitosa");
 
@@ -74,4 +78,5 @@ void loop()
         client.stop(); // Cerrar el cliente
     }
     delay(5000);
+
 }
