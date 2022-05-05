@@ -3,6 +3,9 @@
 const char *ssid = "INFINITUM144F_2.4";
 const char *password = "yfCtu7MuHT";
 
+#define LED_PIN 23
+int led_state = LOW;
+
 #if defined(LED_BUILTIN)
   const int led =  LED_BUILTIN;
 #else
@@ -14,8 +17,8 @@ const char *password = "yfCtu7MuHT";
   #endif
 #endif
 
-const IPAddress serverIP(127,0,0,1); // La dirección que desea visitar
-uint16_t serverPort = 20064;         // Número de puerto del servidor
+const IPAddress serverIP(189,202,79,700); // La dirección que desea visitar
+uint16_t serverPort = 6500;         // Número de puerto del servidor
 
 WiFiClient client; // Declarar un objeto cliente para conectarse al servidor
 
@@ -35,6 +38,7 @@ void setup()
     Serial.println("Connected");
     Serial.print("IP Address:");
     Serial.println(WiFi.localIP());
+    pinMode(LED_PIN, OUTPUT);
 }
 
 void loop()
@@ -54,6 +58,8 @@ void loop()
                 Serial.println(line);
                 digitalWrite(led, 0);
                 digitalWrite(led, 1);
+                led_state = !led_state;
+                digitalWrite(LED_PIN, led_state);
                 
                 client.write(line.c_str()); // Devuelve los datos recibidos
                 
